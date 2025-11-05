@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: todo-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: todo_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: todo-backend
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/todo_db
+    ports:
+      - "5000:5000"
+    #volumes:
+    #  - C:/Users/vinic/OneDrive/Documentos/Projetos/Workshop/TO-DO_Projetc/backend:/app
+    #  - /app/node_modules
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: todo-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - C:/Users/vinic/OneDrive/Documentos/Projetos/Workshop/TO-DO_Projetc/frontend:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - backend
+    command: npm start
+
+volumes:
+  postgres_data:
